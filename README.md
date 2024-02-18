@@ -30,20 +30,16 @@ https://alfahackathon.hopto.org/api/v1/redoc/
     ```
     CSRF_TRUSTED_ORIGINS = ['https://alfahackathon.hopto.org']
     ```
-6. Запустить БД в контейнере:
+6. Выполнить миграции:
     ```
-    docker compose -f docker-compose-local.yml up -d
+    cd ipr/
+    python manage.py migrate
     ```
-7. Выполнить миграции:
+7. Загрузить тестовые данные (при необходимости):
     ```
-      cd ipr/
-      python manage.py migrate
+    python manage.py create_mock_data
     ```
-8. Загрузить тестовые данные (при необходимости):
-    ```
-      python manage.py create_mock_data
-    ```
-9. Запустить сервис разработчика:
+8. Запустить сервис разработчика:
     ```
     python manage.py runserver
     ```
@@ -53,11 +49,12 @@ https://alfahackathon.hopto.org/api/v1/redoc/
 - init-letsencrypt.sh
 - dockerization/nginx/default.conf
 - ipr/ipr/settings.py
-2. Запустить файл init-letsencrypt.sh
+2. Проверить Debug режим в ipr/ipr/settings.py
+3. Запустить файл init-letsencrypt.sh
     ```
     ./init-letsencrypt.sh
     ```
-3. Запустить Docker Compose:
+4. Запустить Docker Compose:
     ```
     docker compose up -d
     ```
