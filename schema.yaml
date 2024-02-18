@@ -1,0 +1,1407 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0 (api/v1)
+paths:
+  /api/v1/auth/:
+    post:
+      operationId: auth_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthToken'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+  /api/v1/iprs/{ipr_id}/tasks/:
+    get:
+      operationId: iprs_tasks_list
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+      - in: path
+        name: ipr_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Статус
+          enum:
+          - Canceled
+          - Done
+          - Failed
+          - In progress
+          - No status
+        description: |-
+          * `In progress` - В работе
+          * `Done` - Выполнен
+          * `Failed` - Не выполнен
+          * `Canceled` - Отменен
+          * `No status` - Отсутствует
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+          description: ''
+    post:
+      operationId: iprs_tasks_create
+      parameters:
+      - in: path
+        name: ipr_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTask'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateTask'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateTask'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTask'
+          description: ''
+  /api/v1/iprs/{ipr_id}/tasks/{id}/:
+    get:
+      operationId: iprs_tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Задача.
+        required: true
+      - in: path
+        name: ipr_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+    put:
+      operationId: iprs_tasks_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Задача.
+        required: true
+      - in: path
+        name: ipr_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTask'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateTask'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateTask'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateTask'
+          description: ''
+    patch:
+      operationId: iprs_tasks_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Задача.
+        required: true
+      - in: path
+        name: ipr_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateTask'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateTask'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateTask'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateTask'
+          description: ''
+    delete:
+      operationId: iprs_tasks_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Задача.
+        required: true
+      - in: path
+        name: ipr_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/iprs/my/:
+    get:
+      operationId: iprs_my_list
+      description: Текущий пользователь - линейный сотрудник, для которого создали
+        ИПР.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReadIprList'
+          description: ''
+    post:
+      operationId: iprs_my_create
+      description: Текущий пользователь - линейный сотрудник, для которого создали
+        ИПР.
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIpr'
+          description: ''
+  /api/v1/iprs/my/{id}/:
+    get:
+      operationId: iprs_my_retrieve
+      description: Текущий пользователь - линейный сотрудник, для которого создали
+        ИПР.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadIpr'
+          description: ''
+    put:
+      operationId: iprs_my_update
+      description: Текущий пользователь - линейный сотрудник, для которого создали
+        ИПР.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIpr'
+          description: ''
+    patch:
+      operationId: iprs_my_partial_update
+      description: Текущий пользователь - линейный сотрудник, для которого создали
+        ИПР.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateIpr'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateIpr'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateIpr'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIpr'
+          description: ''
+    delete:
+      operationId: iprs_my_destroy
+      description: Текущий пользователь - линейный сотрудник, для которого создали
+        ИПР.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/iprs/subordinates/:
+    get:
+      operationId: iprs_subordinates_list
+      description: Текущий пользователь - руководитель - автор ИПР.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReadIprList'
+          description: ''
+    post:
+      operationId: iprs_subordinates_create
+      description: Текущий пользователь - руководитель - автор ИПР.
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIpr'
+          description: ''
+  /api/v1/iprs/subordinates/{id}/:
+    get:
+      operationId: iprs_subordinates_retrieve
+      description: Текущий пользователь - руководитель - автор ИПР.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadIpr'
+          description: ''
+    put:
+      operationId: iprs_subordinates_update
+      description: Текущий пользователь - руководитель - автор ИПР.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateIpr'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIpr'
+          description: ''
+    patch:
+      operationId: iprs_subordinates_partial_update
+      description: Текущий пользователь - руководитель - автор ИПР.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - iprs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateIpr'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateIpr'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCreateIpr'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIpr'
+          description: ''
+    delete:
+      operationId: iprs_subordinates_destroy
+      description: Текущий пользователь - руководитель - автор ИПР.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - iprs
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/tasks/{task_id}/comments/:
+    get:
+      operationId: tasks_comments_list
+      parameters:
+      - in: path
+        name: task_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tasks
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+          description: ''
+    post:
+      operationId: tasks_comments_create
+      parameters:
+      - in: path
+        name: task_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/v1/tasks/{task_id}/comments/{id}/:
+    get:
+      operationId: tasks_comments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: task_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tasks
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    put:
+      operationId: tasks_comments_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: task_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    patch:
+      operationId: tasks_comments_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: task_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedComment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedComment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedComment'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    delete:
+      operationId: tasks_comments_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: task_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tasks
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/users/:
+    get:
+      operationId: users_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+  /api/v1/users/{id}/:
+    get:
+      operationId: users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/users/get_subordinates/:
+    get:
+      operationId: users_get_subordinates_retrieve
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/users/subordinates_without_ipr/:
+    get:
+      operationId: users_subordinates_without_ipr_retrieve
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+          description: ''
+components:
+  schemas:
+    AuthToken:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          readOnly: true
+      required:
+      - password
+      - token
+      - username
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        task:
+          type: integer
+          readOnly: true
+        author:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        text:
+          type: string
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Дата добавления
+      required:
+      - author
+      - created_date
+      - id
+      - task
+      - text
+    CreateIpr:
+      type: object
+      properties:
+        title:
+          type: string
+          title: Название ИПР
+          maxLength: 200
+        employee:
+          type: integer
+        description:
+          type: string
+          title: Описание ИПР
+          maxLength: 200
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status280Enum'
+          title: Статус ИПР
+      required:
+      - description
+      - employee
+      - title
+    CreateTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Название
+          maxLength: 200
+        description:
+          type: string
+          title: Описание
+        status:
+          type: string
+          readOnly: true
+          default: No status
+        author:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        ipr:
+          type: integer
+          title: ИПР
+        start_date:
+          type: string
+          format: date
+          title: Плановое время начала
+        end_date:
+          type: string
+          format: date
+          title: Дата завершения
+        created_date:
+          type: string
+          format: date
+          readOnly: true
+          title: Дата создания
+      required:
+      - author
+      - created_date
+      - description
+      - end_date
+      - id
+      - ipr
+      - start_date
+      - status
+      - title
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        photo:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото
+        fullname:
+          type: string
+          readOnly: true
+        position:
+          type: string
+          title: Должность
+          maxLength: 150
+      required:
+      - fullname
+      - id
+      - position
+    PaginatedReadIprList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadIpr'
+    PaginatedUserList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PatchedComment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        task:
+          type: integer
+          readOnly: true
+        author:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        text:
+          type: string
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Дата добавления
+    PatchedCreateIpr:
+      type: object
+      properties:
+        title:
+          type: string
+          title: Название ИПР
+          maxLength: 200
+        employee:
+          type: integer
+        description:
+          type: string
+          title: Описание ИПР
+          maxLength: 200
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status280Enum'
+          title: Статус ИПР
+    PatchedUpdateTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Название
+          maxLength: 200
+        description:
+          type: string
+          title: Описание
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status965Enum'
+          title: Статус
+        author:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        created_date:
+          type: string
+          format: date
+          readOnly: true
+          title: Дата создания
+        end_date:
+          type: string
+          format: date
+          title: Дата завершения
+        start_date:
+          type: string
+          format: date
+          title: Плановое время начала
+    ReadIpr:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Название ИПР
+          maxLength: 200
+        employee:
+          allOf:
+          - $ref: '#/components/schemas/Employee'
+          readOnly: true
+        author:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          title: Описание ИПР
+          maxLength: 200
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status280Enum'
+          title: Статус ИПР
+        created_date:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Дата создания ИПР
+        start_date:
+          type: string
+          format: date
+          nullable: true
+          title: Дата начала ИПР
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          title: Дата завершения ИПР
+      required:
+      - author
+      - created_date
+      - description
+      - employee
+      - id
+      - title
+    Status280Enum:
+      enum:
+      - Not started
+      - In progress
+      - Done
+      - Failed
+      - Canceled
+      - No status
+      type: string
+      description: |-
+        * `Not started` - Не начат
+        * `In progress` - В работе
+        * `Done` - Выполнен
+        * `Failed` - Не выполнен
+        * `Canceled` - Отменен
+        * `No status` - Отсутствует
+    Status965Enum:
+      enum:
+      - In progress
+      - Done
+      - Failed
+      - Canceled
+      - No status
+      type: string
+      description: |-
+        * `In progress` - В работе
+        * `Done` - Выполнен
+        * `Failed` - Не выполнен
+        * `Canceled` - Отменен
+        * `No status` - Отсутствует
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Название
+          maxLength: 200
+        description:
+          type: string
+          title: Описание
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status965Enum'
+          title: Статус
+        author:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        ipr:
+          type: string
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          title: Дата завершения
+        created_date:
+          type: string
+          format: date
+          readOnly: true
+          title: Дата создания
+        start_date:
+          type: string
+          format: date
+          title: Плановое время начала
+      required:
+      - author
+      - created_date
+      - description
+      - end_date
+      - id
+      - ipr
+      - start_date
+      - title
+    UpdateTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          title: Название
+          maxLength: 200
+        description:
+          type: string
+          title: Описание
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status965Enum'
+          title: Статус
+        author:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        created_date:
+          type: string
+          format: date
+          readOnly: true
+          title: Дата создания
+        end_date:
+          type: string
+          format: date
+          title: Дата завершения
+        start_date:
+          type: string
+          format: date
+          title: Плановое время начала
+      required:
+      - author
+      - created_date
+      - description
+      - end_date
+      - id
+      - start_date
+      - title
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        photo:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        patronymic:
+          type: string
+          title: Отчество
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        position:
+          type: string
+          title: Должность
+          maxLength: 150
+        superiors:
+          type: array
+          items:
+            type: integer
+            title: Руководители
+          title: Руководители
+        subordinates:
+          type: array
+          items:
+            type: integer
+      required:
+      - id
+      - patronymic
+      - position
+      - subordinates
+      - superiors
+      - username
+  securitySchemes:
+    tokenAuth:
+      type: http
+      scheme: bearer
